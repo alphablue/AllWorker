@@ -62,10 +62,12 @@ fun EmailField(
                 Icon(
                     imageVector = Icons.Default.Clear,
                     contentDescription = "clear text",
-                    modifier = Modifier.size(12.dp).clickable {
-                        email= ""
-                        localFocusRequester.requestFocus()
-                    }
+                    modifier = Modifier
+                        .size(12.dp)
+                        .clickable {
+                            email = ""
+                            localFocusRequester.requestFocus()
+                        }
                 )
             else
                 null
@@ -91,6 +93,7 @@ fun PasswordField(
     keyboardController: SoftwareKeyboardController?
 ) {
     var password by remember { mutableStateOf("")}
+    var isValidPassword by remember { mutableStateOf(true)}
 
     TextField(
         value = password,
@@ -100,7 +103,17 @@ fun PasswordField(
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(
-            onDone = { keyboardController?.hide()}
+            onDone = {
+                isValidPassword = TextUtil.isValidPassword(password)
+
+                if (isValidPassword)
+                    keyboardController?.hide()}
         )
     )
+
+    if(isValidPassword.not())
+        Text(
+            text = "비밀번호는 영문 소문자 숫자를 혼합하여 6자리 이상 13자리 이하여야 합니다.",
+            color = MaterialTheme.colors.error
+        )
 }
