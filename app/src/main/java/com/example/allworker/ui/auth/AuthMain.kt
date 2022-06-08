@@ -1,18 +1,24 @@
 package com.example.allworker.ui.auth
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -36,17 +42,34 @@ fun AuthMain() {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
+@Suppress("UNUSED_EXPRESSION", "EXPERIMENTAL_IS_NOT_ENABLED")
 @Composable
 fun EmailField(
     focusRequester: FocusRequester
 ) {
     var email by remember { mutableStateOf("")}
     var emailValidCheck by remember { mutableStateOf(true)}
-    
+    val (localFocusRequester) = FocusRequester.createRefs()
+
     TextField(
+        modifier = Modifier.focusRequester(localFocusRequester),
         value = email,
         onValueChange = {email = it},
         label = { Text("Email")},
+        trailingIcon = {
+            if(email.isBlank().not())
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = "clear text",
+                    modifier = Modifier.size(12.dp).clickable {
+                        email= ""
+                        localFocusRequester.requestFocus()
+                    }
+                )
+            else
+                null
+                       },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
         keyboardActions = KeyboardActions(onNext = {
             emailValidCheck = TextUtil.isValidEmail(email)
