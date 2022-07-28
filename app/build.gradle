@@ -35,6 +35,12 @@ android {
     buildFeatures {
         compose true
     }
+
+    sourceSets {
+        all {
+        }
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
     }
@@ -74,3 +80,5 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:8.0.1'
     implementation 'com.firebaseui:firebase-ui-database:8.0.1'
 }
+
+apply plugin: 'com.google.gms.google-services'

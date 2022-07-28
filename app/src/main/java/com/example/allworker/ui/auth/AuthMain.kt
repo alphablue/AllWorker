@@ -2,6 +2,7 @@
 
 package com.example.allworker.ui.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -15,6 +16,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -23,12 +25,19 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.allworker.util.TextUtil
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AuthMain() {
     val (focusRequester) = FocusRequester.createRefs()
     val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
+
+    var email by remember { mutableStateOf("")}
+    var password by remember { mutableStateOf("")}
 
     Column(
         modifier = Modifier
@@ -38,8 +47,22 @@ fun AuthMain() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        EmailField(focusRequester = focusRequester)
-        PasswordField(focusRequester = focusRequester, keyboardController = keyboardController)
+        EmailField(
+            email = email,
+            onEmailChange = { email = it},
+            focusRequester = focusRequester
+        )
+        PasswordField(password = password,
+            onPassWordChange = { password = it},
+            focusRequester = focusRequester,
+            keyboardController = keyboardController
+        )
+
+        Button(onClick = {
+            Toast.makeText(context, "$email , $password", Toast.LENGTH_SHORT).show()
+        }) {
+
+        }
     }
 }
 
@@ -47,9 +70,11 @@ fun AuthMain() {
 @Suppress("UNUSED_EXPRESSION", "EXPERIMENTAL_IS_NOT_ENABLED")
 @Composable
 fun EmailField(
+    email: String,
+    onEmailChange: (String) -> Unit,
     focusRequester: FocusRequester
 ) {
-    var email by remember { mutableStateOf("")}
+
     var emailValidCheck by remember { mutableStateOf(true)}
     val (localFocusRequester) = FocusRequester.createRefs()
 
@@ -58,7 +83,7 @@ fun EmailField(
             .focusRequester(localFocusRequester)
             .fillMaxWidth(0.8f),
         value = email,
-        onValueChange = {email = it},
+        onValueChange = {onEmailChange(it)},
         label = { Text("Email")},
         placeholder = { Text("example@gmail.com") },
         singleLine = true,
@@ -70,7 +95,7 @@ fun EmailField(
                     modifier = Modifier
                         .size(12.dp)
                         .clickable {
-                            email = ""
+                            onEmailChange("")
                             localFocusRequester.requestFocus()
                         }
                 )
@@ -94,17 +119,18 @@ fun EmailField(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PasswordField(
+    password: String,
+    onPassWordChange: (String) -> Unit,
     focusRequester: FocusRequester,
     keyboardController: SoftwareKeyboardController?
 ) {
-    var password by remember { mutableStateOf("")}
     var isValidPassword by remember { mutableStateOf(true)}
 
     TextField(
         value = password,
         singleLine = true,
         placeholder = { Text(text = "영문자, 숫자 조합 6자리 이상 13자리 이하", fontSize = 10.sp)},
-        onValueChange = {password = it},
+        onValueChange = {onPassWordChange(it)},
         modifier = Modifier
             .focusRequester(focusRequester)
             .fillMaxWidth(0.8f),
@@ -118,7 +144,7 @@ fun PasswordField(
                     modifier = Modifier
                         .size(12.dp)
                         .clickable {
-                            password = ""
+                            onPassWordChange("")
                             focusRequester.requestFocus()
                             keyboardController?.show()
                         }
@@ -133,7 +159,7 @@ fun PasswordField(
                     keyboardController?.hide()
                 }
                 else {
-                    password = ""
+                    onPassWordChange("")
                 }
             }
         )
