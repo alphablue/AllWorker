@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AllWorkerTheme {
-                AuthMain()
+                AuthMain(auth)
             }
         }
     }
